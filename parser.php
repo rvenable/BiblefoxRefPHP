@@ -259,11 +259,14 @@ class BfoxRefParser {
 
 				$left = explode(':', $dash[0], 2);
 				$ch1 = intval($left[0]);
-				$vs1 = intval($left[1]);
+				$vs1 = isset($left[1]) ? intval($left[1]) : 0;
 
-				$right = explode(':', $dash[1], 2);
-				$ch2 = intval($right[0]);
-				$vs2 = intval($right[1]);
+				$ch2 = $vs2 = 0;
+				if (isset($dash[1])) {
+					$right = explode(':', $dash[1], 2);
+					$ch2 = intval($right[0]);
+					$vs2 = isset($right[1]) ? intval($right[1]) : 0;
+				}
 
 				// We must have a chapter1
 				if (0 != $ch1) {
