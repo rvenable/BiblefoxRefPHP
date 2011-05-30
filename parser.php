@@ -173,8 +173,8 @@ class BfoxRefParser {
 
 			// Regex = word boundary, book regex, word boundary, CV regex
 			// CV regex = optional period, optional whitespace, number, optional [\s-:,;] ending with number
-			if ($this->forward) $this->_regex = "/\b($book_regex)\b(\.?\s$space_star\d([\s-:,;]*\d)*)$cv_question/i";
-			else $this->_regex = "/((\d[\s-:,;]*)*\d\s$space_star\.?)$cv_question\b($book_regex)\b/i";
+			if ($this->forward) $this->_regex = "/\b($book_regex)\b(\.?\s$space_star\d([\s-:,;\.]*\d)*)$cv_question/i";
+			else $this->_regex = "/((\d[\s-:,;\.]*)*\d\s$space_star\.?)$cv_question\b($book_regex)\b/i";
 		}
 
 		return $this->_regex;
@@ -248,6 +248,9 @@ class BfoxRefParser {
 	private static function parse_book_str(BfoxRef &$ref, $book_id, $str) {
 		// Spaces between numbers count as semicolons
 		preg_replace('/(\d)\s+(\d)/', '$1;$2', $str);
+		
+		// Periods between numbers count as colons
+		$str = str_replace('.', ':', $str);
 
 		$semis = explode(';', $str);
 		foreach ($semis as $semi) {

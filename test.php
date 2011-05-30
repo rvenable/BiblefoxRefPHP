@@ -86,6 +86,11 @@ class BfoxTests {
 
 		// Test periods
 		$this->test_ref('1sam. 1', '1 Samuel 1');
+		$this->test_ref('1sam 1.1', '1 Samuel 1:1');
+		$this->test_ref('1sam 1.1-5', '1 Samuel 1:1-5');
+		$this->test_ref('1sam 1.1-2.5', '1 Samuel 1-2:5');
+		$this->test_ref('1sam 1.2-2.5', '1 Samuel 1:2-2:5');
+		$this->test_ref('1sam 1-2.5', '1 Samuel 1-2:5');
 
 		// This test was failing (see bug 21)
 		$this->test_ref('Judges 2:6-3:6', 'Judges 2:6-3:6');
