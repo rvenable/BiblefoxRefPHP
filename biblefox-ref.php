@@ -504,40 +504,44 @@ class BfoxRef extends BfoxSequenceList {
 
 		return BibleMeta::get_book_name($book, $name) . ' ' . $ch;
 	}
+
+	public function add_group($group = '') {
+		if (!empty($group)) {
+			$this->group = $group;
+			$start = self::get_first_book_of_group($group);
+			$end = self::get_last_book_of_group($group);
+			for ($i = $start; $i <= $end; $i++) $this->add_whole_book($i);
+		}
+	}
+
+	public static function get_first_book_of_group($group) {
+		$book = 0;
+
+		if (isset(BibleMeta::$book_groups[$group][0])) {
+			$book = BibleMeta::$book_groups[$group][0];
+			if (isset(BibleMeta::$book_groups[$book])) $book = self::get_first_book_of_group($book);
+		}
+
+		return $book;
+	}
+
+	public static function get_last_book_of_group($group) {
+		$last_index = count(BibleMeta::$book_groups[$group]) - 1;
+		$book = 0;
+		if ((0 < $last_index) && isset(BibleMeta::$book_groups[$group][$last_index])) {
+			$book = BibleMeta::$book_groups[$group][$last_index];
+			if (isset(BibleMeta::$book_groups[$book])) $book = self::get_last_book_of_group($book);
+		}
+
+		return $book;
+	}
 }
 
 class BibleGroupPassage extends BfoxRef {
 	private $group;
 
 	public function __construct($group = '') {
-		if (!empty($group)) {
-			$this->group = $group;
-			$start = self::get_first_book($group);
-			$end = self::get_last_book($group);
-			for ($i = $start; $i <= $end; $i++) $this->add_whole_book($i);
-		}
-	}
-
-	public static function get_first_book($group) {
-		$book = 0;
-
-		if (isset(BibleMeta::$book_groups[$group][0])) {
-			$book = BibleMeta::$book_groups[$group][0];
-			if (isset(BibleMeta::$book_groups[$book])) $book = self::get_first_book($book);
-		}
-
-		return $book;
-	}
-
-	public static function get_last_book($group) {
-		$last_index = count(BibleMeta::$book_groups[$group]) - 1;
-		$book = 0;
-		if ((0 < $last_index) && isset(BibleMeta::$book_groups[$group][$last_index])) {
-			$book = BibleMeta::$book_groups[$group][$last_index];
-			if (isset(BibleMeta::$book_groups[$book])) $book = self::get_last_book($book);
-		}
-
-		return $book;
+		$this->add_group($group);
 	}
 
 	public function get_string($name = '') {
