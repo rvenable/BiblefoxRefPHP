@@ -535,6 +535,13 @@ class BfoxRef extends BfoxSequenceList {
 
 		return $book;
 	}
+
+	public function book_ref() {
+		$bcvs = BfoxRef::get_bcvs($this->get_seqs());
+		$book_ref = new BfoxRef();
+		foreach ($bcvs as $book => $cvs) $book_ref->add_whole_book($book);
+		return $book_ref;
+	}
 }
 
 class BibleGroupPassage extends BfoxRef {
