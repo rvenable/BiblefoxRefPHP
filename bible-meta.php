@@ -3,6 +3,7 @@
 class BibleMeta {
 	const name_normal = 'name';
 	const name_short = 'short_name';
+	const name_none = 'none';
 
 	const start_book = 1; // Genesis
 	const start_chapter = 1;

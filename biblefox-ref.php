@@ -383,6 +383,7 @@ class BfoxRef extends BfoxSequenceList {
 			}
 		}
 
+		if (BibleMeta::name_none == $name) return $str;
 		if (!empty($str)) $str = " $str";
 
 		return BibleMeta::get_book_name($book, $name) . $str;
