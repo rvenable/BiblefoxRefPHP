@@ -43,6 +43,7 @@ class BfoxPlanScheduler {
 	}
 
 	function normalizeTime($time = null) {
+		if (empty($time)) $time = time();
 		// Return a time that corresponds to the first second of the day
 		return strtotime(date('Y-m-d', $time)); // We are formatting as 'Y-m-d', but we could use any format as long as it includes the date and excludes the time
 	}
