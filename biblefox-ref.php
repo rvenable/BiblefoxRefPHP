@@ -507,7 +507,6 @@ class BfoxRef extends BfoxSequenceList {
 
 	public function add_group($group = '') {
 		if (!empty($group)) {
-			$this->group = $group;
 			$start = self::get_first_book_of_group($group);
 			$end = self::get_last_book_of_group($group);
 			for ($i = $start; $i <= $end; $i++) $this->add_whole_book($i);
@@ -548,6 +547,7 @@ class BibleGroupPassage extends BfoxRef {
 	private $group;
 
 	public function __construct($group = '') {
+		$this->group = $group;
 		$this->add_group($group);
 	}
 
