@@ -4,6 +4,7 @@ class BfoxBibleToolLink {
 	var $varCallbacks;
 	var $varCallbackParams = array();
 	var $varValues = array();
+	var $urlEncodeCallback = 'urlencode';
 
 	function __construct() {
 		$this->varCallbacks = array(
@@ -50,13 +51,17 @@ class BfoxBibleToolLink {
 		}
 	}
 
+	function urlEncode($url) {
+		return call_user_func($this->urlEncodeCallback, $url);
+	}
+
 	function refString() {
-		return urlencode($this->_ref->get_string());
+		return $this->urlEncode($this->_ref->get_string());
 	}
 
 	private $_bookName;
 	function bookName() {
-		return urlencode($this->_bookName);
+		return $this->urlEncode($this->_bookName);
 	}
 
 	private $_chapterNum;
