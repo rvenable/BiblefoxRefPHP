@@ -73,7 +73,7 @@ class BfoxExternalBibleToolApi extends BfoxBibleToolApi {
 	}
 
 	function urlForRef(BfoxRef $ref) {
-		$this->linker->setRef(bfox_ref());
+		$this->linker->setRef($ref);
 		return $this->linker->urlForTemplate($this->urlTemplate);
 	}
 
@@ -185,7 +185,7 @@ class BfoxExternalCustomJSONPBibleToolApi extends BfoxExternalJSONPBibleToolApi 
 	}
 
 	function urlForRef(BfoxRef $ref) {
-		$this->linker->setRef(bfox_ref());
+		$this->linker->setRef($ref);
 		return $this->linker->urlForTemplate($this->urlTemplate);
 	}
 
