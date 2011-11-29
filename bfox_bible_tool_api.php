@@ -207,7 +207,15 @@ class BfoxRefTaggerApi extends BfoxExternalCustomJSONPBibleToolApi {
 	}
 }
 
-class BfoxNETBibleApi extends BfoxExternalCustomJSONPBibleToolApi {
+class BfoxNETBibleApi extends BfoxExternalBibleToolApi {
+	function __construct() {
+		$this->availableBibles = array('NET');
+
+		parent::__construct('http://labs.bible.org/api/?passage=%ref%&formatting=full', $apiKey);
+	}
+}
+
+class BfoxNETBibleJavaScriptApi extends BfoxExternalCustomJSONPBibleToolApi {
 	function __construct() {
 		$this->availableBibles = array('NET');
 
@@ -222,6 +230,18 @@ class BfoxNETBibleTaggerApi extends BfoxExternalJSONPBibleToolApi {
 		parent::__construct('http://labs.bible.org/api/NETBibleTagger/v2/script_get_verse.php?passage=%ref%&translation=%bible%', 'org.bible.NETBibleTagger.jsonCallback', 'content');
 
 		$this->setBible('net');
+	}
+}
+
+class BfoxESVApi extends BfoxExternalBibleToolApi {
+	function __construct($apiKey = '') {
+		if (empty($apiKey)) $apiKey = 'IP';
+
+		$this->availableBibles = array('esv');
+
+		parent::__construct('http://www.esvapi.org/v2/rest/passageQuery?key=%apiKey%&passage=%ref%', $apiKey);
+
+		$this->setBible('esv');
 	}
 }
 
