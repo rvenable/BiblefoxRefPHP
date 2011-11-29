@@ -53,6 +53,20 @@ abstract class BfoxLocalBibleToolApi extends BfoxBibleToolApi {
 	}
 }
 
+/**
+ * Class for an external Bible Tool on another server
+ *
+ * Loads content with a simple file_get_contents($url) call.
+ *
+ * For Javascript based APIs use subclasses:
+ * @see BfoxExternalJSBibleToolApi
+ * @see BfoxExternalJSONPBibleToolApi
+ * @see BfoxExternalCustomJSONPBibleToolApi
+ *
+ * For embedding an external resource in an iframe use subclass:
+ * @see BfoxBibleToolIframeApi
+ *
+ */
 class BfoxExternalBibleToolApi extends BfoxBibleToolApi {
 	var $urlTemplate;
 	var $linker;
@@ -86,6 +100,10 @@ class BfoxExternalBibleToolApi extends BfoxBibleToolApi {
 	}
 }
 
+/**
+ * Loads an external Bible tool inside of an iframe
+ *
+ */
 class BfoxBibleToolIframeApi extends BfoxExternalBibleToolApi {
 	function echoContentForUrl($url) {
 ?>
@@ -94,6 +112,10 @@ class BfoxBibleToolIframeApi extends BfoxExternalBibleToolApi {
 	}
 }
 
+/**
+ * Loads an external Bible tool by embedding Javascript
+ *
+ */
 class BfoxExternalJSBibleToolApi extends BfoxExternalBibleToolApi {
 
 	function echoContentForUrl($url) {
@@ -104,6 +126,14 @@ class BfoxExternalJSBibleToolApi extends BfoxExternalBibleToolApi {
 	}
 }
 
+/**
+ * Loads an external Bible tool by embedding Javascript using a JSONP API
+ *
+ * JSONP allows an API call to request the content be wrapped in a callback.
+ * This class declares a JS callback that the API then sends the content to,
+ * embedding the content in our webpage.
+ *
+ */
 class BfoxExternalJSONPBibleToolApi extends BfoxExternalJSBibleToolApi {
 	var $callbackName;
 	var $callbackDataVar;
@@ -114,7 +144,9 @@ class BfoxExternalJSONPBibleToolApi extends BfoxExternalJSBibleToolApi {
 		$this->callbackDataVar = $callbackDataVar;
 	}
 
-	// Creates javascript for declaring all the members of a callback
+	/**
+	 * Creates javascript for declaring all the members of a callback
+	 */
 	function declareCallbackObjects() {
 		$callbackObjects = explode('.', $this->callbackName);
 		$allObjects = '';
@@ -137,7 +169,9 @@ class BfoxExternalJSONPBibleToolApi extends BfoxExternalJSBibleToolApi {
 		}
 	}
 
-	// Creates javascript for defining the callback function
+	/**
+	 * Creates javascript for defining the callback function
+	 */
 	function defineCallback() {
 ?>
 			<?php echo $this->callbackName; ?> = function(data) {
@@ -166,6 +200,14 @@ class BfoxExternalJSONPBibleToolApi extends BfoxExternalJSBibleToolApi {
 	}
 }
 
+/**
+ * Loads an external Bible tool by embedding Javascript using a JSONP API
+ *
+ * JSONP allows an API call to request the content be wrapped in a callback.
+ * This class declares a custom JS callback that the API then sends the content to,
+ * embedding the content in our webpage.
+ *
+ */
 class BfoxExternalCustomJSONPBibleToolApi extends BfoxExternalJSONPBibleToolApi {
 
 	function __construct($urlTemplate, $callbackDataVar) {
@@ -196,6 +238,20 @@ class BfoxExternalCustomJSONPBibleToolApi extends BfoxExternalJSONPBibleToolApi 
 	}
 }
 
+/*
+ *
+ * Sample Bible APIs
+ *
+ */
+
+/**
+ * API used by the great RefTagger plugin, loaded by Javascript
+ *
+ * A great API with a lot of Bible versions, but it only returns a few verses max
+ *
+ * @see http://reftagger.com/
+ *
+ */
 class BfoxRefTaggerApi extends BfoxExternalCustomJSONPBibleToolApi {
 	function __construct($bible) {
 		$this->availableBibles = array('ESV', 'NIV');
@@ -207,6 +263,12 @@ class BfoxRefTaggerApi extends BfoxExternalCustomJSONPBibleToolApi {
 	}
 }
 
+/**
+ * Official NET Bible API
+ *
+ * @see http://labs.bible.org/api_web_service
+ *
+ */
 class BfoxNETBibleApi extends BfoxExternalBibleToolApi {
 	function __construct() {
 		$this->availableBibles = array('NET');
@@ -215,6 +277,19 @@ class BfoxNETBibleApi extends BfoxExternalBibleToolApi {
 	}
 }
 
+/**
+ * Official NET Bible API loaded by Javascript
+ *
+ * We don't recommend this one because it adds copyright notices to every verse.
+ * Instead, we recommend the API that is used by the official NET Bible Tagger plugin,
+ * which just puts one copyright notice at the end of all the verses.
+ *
+ * Use BfoxNETBibleTaggerApi instead
+ * @see BfoxNETBibleTaggerApi
+ *
+ * @see http://labs.bible.org/api_web_service
+ *
+ */
 class BfoxNETBibleJavaScriptApi extends BfoxExternalCustomJSONPBibleToolApi {
 	function __construct() {
 		$this->availableBibles = array('NET');
@@ -223,6 +298,15 @@ class BfoxNETBibleJavaScriptApi extends BfoxExternalCustomJSONPBibleToolApi {
 	}
 }
 
+/**
+ * Official NET Bible API loaded by Javascript, used by their NET Bible Tagger plugin
+ *
+ * This API is better than the regular NET Bible API because it
+ * just puts one copyright notice at the end of all the verses.
+ *
+ * @see http://labs.bible.org/NETBibleTagger
+ *
+ */
 class BfoxNETBibleTaggerApi extends BfoxExternalJSONPBibleToolApi {
 	function __construct() {
 		$this->availableBibles = array('net');
@@ -233,6 +317,12 @@ class BfoxNETBibleTaggerApi extends BfoxExternalJSONPBibleToolApi {
 	}
 }
 
+/**
+ * Official ESV API
+ *
+ * @see http://www.esvapi.org/
+ *
+ */
 class BfoxESVApi extends BfoxExternalBibleToolApi {
 	function __construct($apiKey = '') {
 		if (empty($apiKey)) $apiKey = 'IP';
@@ -245,6 +335,12 @@ class BfoxESVApi extends BfoxExternalBibleToolApi {
 	}
 }
 
+/**
+ * Official ESV API loaded by Javascript
+ *
+ * @see http://www.esvapi.org/
+ *
+ */
 class BfoxESVJavaScriptApi extends BfoxExternalJSBibleToolApi {
 	function __construct() {
 		$this->availableBibles = array('esv');
@@ -255,6 +351,14 @@ class BfoxESVJavaScriptApi extends BfoxExternalJSBibleToolApi {
 	}
 }
 
+/**
+ * The Biblia API, made by Logos (requires API Key)
+ *
+ * This API has a lot of available versions, but requires an API key
+ *
+ * @see http://api.biblia.com/
+ *
+ */
 class BfoxBibliaApi extends BfoxExternalBibleToolApi {
 	function __construct($bible, $apiKey) {
 		$this->availableBibles = array('LEB');
