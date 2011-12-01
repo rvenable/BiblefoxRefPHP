@@ -1,6 +1,6 @@
 <?php
 
-class BfoxSequence {
+class BfoxRange {
 	public $start, $end;
 
 	public function __construct($start = 0, $end = 0) {
@@ -13,7 +13,7 @@ class BfoxSequence {
 	}
 }
 
-abstract class BfoxSequenceList {
+abstract class BfoxRangeList {
 	protected $sequences = array();
 
 	public function is_valid() {
@@ -63,15 +63,15 @@ abstract class BfoxSequenceList {
 	 *
 	 * This function maintains that there are no overlapping sequences and that they are in order from lowest to highest
 	 *
-	 * @param BfoxSequence $seq
+	 * @param BfoxRange $seq
 	 * @param boolean $test_only Set to true if you just want to check if the sequence intersects
 	 * @return boolean $is_modified Returns whether there were modifications (can be used to detect whether this sequence is contained in the list already)
 	 */
-	public function add_seq(BfoxSequence $seq, $test_only = false) {
+	public function add_seq(BfoxRange $seq, $test_only = false) {
 		if (!$seq->is_valid()) return false;
 
 		// Make a copy of the sequence since it was passed by reference
-		$new_seq = new BfoxSequence($seq->start, $seq->end);
+		$new_seq = new BfoxRange($seq->start, $seq->end);
 
 		$is_modified = false;
 
@@ -128,15 +128,15 @@ abstract class BfoxSequenceList {
 	/**
 	 * Subtracts a sequence from the list
 	 *
-	 * @param BfoxSequence $seq
+	 * @param BfoxRange $seq
 	 * @param boolean $test_only Set to true if you just want to check if the sequence intersects
 	 * @return boolean $is_modified Returns whether there were modifications (can be used to detect intersections)
 	 */
-	public function sub_seq(BfoxSequence $seq, $test_only = false) {
+	public function sub_seq(BfoxRange $seq, $test_only = false) {
 		if (!$seq->is_valid()) return false;
 
 		// Make a copy of the sequence since it was passed by reference
-		$sub_seq = new BfoxSequence($seq->start, $seq->end);
+		$sub_seq = new BfoxRange($seq->start, $seq->end);
 
 		$is_modified = false;
 
@@ -256,10 +256,10 @@ abstract class BfoxSequenceList {
 	/**
 	 * Returns whether the given sequence list is already contained by this sequence list
 	 *
-	 * @param BfoxSequenceList $seq_list
+	 * @param BfoxRangeList $seq_list
 	 * @return boolean
 	 */
-	public function contains(BfoxSequenceList $seq_list) {
+	public function contains(BfoxRangeList $seq_list) {
 		// Test each sequence to see if it would modify our sequence list if we added it
 		// If it never modifies our list, then our list already contains it all
 		return !$this->add_seqs($seq_list->get_seqs(), true);
@@ -268,10 +268,10 @@ abstract class BfoxSequenceList {
 	/**
 	 * Returns whether the given sequence list intersects this sequence list
 	 *
-	 * @param BfoxSequenceList $seq_list
+	 * @param BfoxRangeList $seq_list
 	 * @return boolean
 	 */
-	public function intersects(BfoxSequenceList $seq_list) {
+	public function intersects(BfoxRangeList $seq_list) {
 		// Test each sequence to see if it would modify our sequence list if we subtracted it
 		// If it never modifies our list, then our list never intersects
 		return $this->sub_seqs($seq_list->get_seqs(), true);

@@ -1,6 +1,6 @@
 <?php
 
-class BfoxSequenceDbTable {
+class BfoxRangeDbTable {
 	protected $table_name;
 	protected $data_table_name;
 	protected $item_id_definition;
@@ -70,11 +70,11 @@ class BfoxSequenceDbTable {
 
 	/**
 	 * Returns a string with SQL for a WHERE statement to specify the sequence to select
-	 * @param BfoxSequenceList $seqs
+	 * @param BfoxRangeList $seqs
 	 * @param string $short_table_name
 	 * @return string
 	 */
-	public function seqs_where(BfoxSequenceList $seqs, $short_table_name = 'seqs') {
+	public function seqs_where(BfoxRangeList $seqs, $short_table_name = 'seqs') {
 		return $seqs->sql_where2("$short_table_name.start", "$short_table_name.end");
 	}
 
@@ -138,10 +138,10 @@ class BfoxSequenceDbTable {
 	 * Save a sequence list for the given item ID
 	 *
 	 * @param array $item_id
-	 * @param BfoxSequenceList $seqs
+	 * @param BfoxRangeList $seqs
 	 * @return boolean (TRUE if there were actually sequences to save)
 	 */
-	public function save_item($item_id, BfoxSequenceList $seqs) {
+	public function save_item($item_id, BfoxRangeList $seqs) {
 		$this->delete_items(array($item_id));
 
 		if ($seqs->is_valid()) {
@@ -175,7 +175,7 @@ class BfoxSequenceDbTable {
 	}
 }
 
-class BfoxRefDbTable extends BfoxSequenceDbTable {
+class BfoxRefDbTable extends BfoxRangeDbTable {
 
 	public function __construct($data_table_name, $postfix = '_bfox_refs') {
 		parent::__construct($data_table_name, $postfix);

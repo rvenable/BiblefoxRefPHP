@@ -5,11 +5,11 @@ if (!defined('BFOX_REF_DIR')) define('BFOX_REF_DIR', dirname(__FILE__));
 
 require_once BFOX_REF_DIR . '/bible-meta.php';
 require_once BFOX_REF_DIR . '/verse.php';
-require_once BFOX_REF_DIR . '/sequences.php';
+require_once BFOX_REF_DIR . '/bfox_range_list.php';
 require_once BFOX_REF_DIR . '/parser.php';
 require_once BFOX_REF_DIR . '/db-table.php';
 
-class BfoxRefSequence extends BfoxSequence {
+class BfoxRefRange extends BfoxRange {
 
 	public function __construct($start = 0, $end = 0) {
 		$this->set_start($start);
@@ -101,7 +101,7 @@ class BfoxRefSequence extends BfoxSequence {
 	}
 }
 
-class BfoxRef extends BfoxSequenceList {
+class BfoxRef extends BfoxRangeList {
 
 	/*
 	 * Creation and Modification Functions
@@ -142,7 +142,7 @@ class BfoxRef extends BfoxSequenceList {
 
 	public function add_concat($begin_str, $end_str, $delim = ',') {
 		$ends = explode($delim, $end_str);
-		foreach (explode($delim, $begin_str) as $idx => $begin) if (isset($ends[$idx])) $this->add_seq(new BfoxRefSequence($begin, $ends[$idx]));
+		foreach (explode($delim, $begin_str) as $idx => $begin) if (isset($ends[$idx])) $this->add_seq(new BfoxRefRange($begin, $ends[$idx]));
 	}
 
 	/**
@@ -234,7 +234,7 @@ class BfoxRef extends BfoxSequenceList {
 	 * @param integer $verse2
 	 */
 	public function add_verse_seq($book, $chapter1, $verse1, $chapter2, $verse2) {
-		return $this->add_seq(new BfoxRefSequence(
+		return $this->add_seq(new BfoxRefRange(
 			array($book, $chapter1, $verse1),
 			array($book, $chapter2, $verse2)));
 	}
@@ -404,7 +404,7 @@ class BfoxRef extends BfoxSequenceList {
 		if (BibleVerse::max_chapter_id == $ch2) $ch2 = BibleMeta::passage_end($book);
 
 		$seqs = array();
-		$seqs[$ch1] = new BfoxRefSequence;
+		$seqs[$ch1] = new BfoxRefRange;
 		$seqs[$ch1]->set_start(array($book, $ch1, $vs1));
 		if ($ch2 > $ch1) {
 			$seqs[$ch1]->set_end(array($book, $ch1, BibleVerse::max_verse_id));
@@ -412,10 +412,10 @@ class BfoxRef extends BfoxSequenceList {
 			$middle_chapters = $ch2 - $ch1;
 			for ($i = 0; $i < $middle_chapters; $i++) {
 				$ch = $ch1 + $i;
-				$seqs[$ch] = new BfoxRefSequence(array($book, $ch, 0), array($book, $ch, BibleVerse::max_verse_id));
+				$seqs[$ch] = new BfoxRefRange(array($book, $ch, 0), array($book, $ch, BibleVerse::max_verse_id));
 			}
 
-			$seqs[$ch2] = new BfoxRefSequence;
+			$seqs[$ch2] = new BfoxRefRange;
 			$seqs[$ch2]->set_start(array($book, $ch2, 0));
 		}
 		$seqs[$ch2]->set_end(array($book, $ch2, $vs2));
