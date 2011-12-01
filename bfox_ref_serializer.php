@@ -86,12 +86,29 @@ class BfoxRefSerializer {
 		return $result;
 	}
 
+	/**
+	 * Returns an array of Reference strings and separation punctuation
+	 *
+	 * Example: Genesis 1; Exodus 1 returns array('Genesis 1', '; ', 'Exodus 1')
+	 *
+	 * @param BfoxRef $ref
+	 * @return array
+	 */
+	function elementsForRef(BfoxRef $ref) {
+		$elements = $this->pushRef($ref);
+		$this->reset();
+		return $elements;
+	}
+
 	function pushRef(BfoxRef $ref) {
 		$ranges = $ref->refRanges();
 
+		$elements = array();
 		foreach ($ranges as $range) {
-			$this->pushRefRange($range);
+			$elements = array_merge($elements, $this->pushRefRange($range));
 		}
+
+		return $elements;
 	}
 
 	function pushRefRange(BfoxRefRange $range) {
@@ -110,20 +127,27 @@ class BfoxRefSerializer {
 			else if (!$value1) $value1 = 1;
 		}
 
-		$this->pushVerseVector($vector1, 'separator', $this->maximumDivergenceLevel);
-		$this->pushVerseVector($vector2, 'connector');
+		$elements1 = $this->pushVerseVector($vector1, 'separator', $this->maximumDivergenceLevel);
+		$elements2 = $this->pushVerseVector($vector2, 'connector');
+		$elements1[count($elements1) - 1] .= implode('', $elements2);
+
+		return $elements1;
 	}
 
 	function pushVerseVector($vector, $punctuation, $maxLevel = 3) {
 		$level = 0;
+		$elements = array();
 
 		if (!empty($this->lastVerseVector)) {
 			$level = min($this->levelOfDivergence($this->lastVerseVector, $vector), $maxLevel);
-			$this->result .= $this->punctuationForLevel($punctuation, $level);
+			$elements []= $this->punctuationForLevel($punctuation, $level);
 		}
 
-		$this->result .= $this->stringForVector($vector, $level);
+		$elements []= $this->stringForVector($vector, $level);
+		$this->result .= implode('', $elements);
 		$this->lastVerseVector = $vector;
+
+		return $elements;
 	}
 
 	function stringForVector($vector, $startLevel = 0) {
