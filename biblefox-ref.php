@@ -8,12 +8,21 @@ require_once BFOX_REF_DIR . '/verse.php';
 require_once BFOX_REF_DIR . '/bfox_range_list.php';
 require_once BFOX_REF_DIR . '/parser.php';
 require_once BFOX_REF_DIR . '/db-table.php';
+require_once BFOX_REF_DIR . '/bfox_ref_serializer.php';
 
 class BfoxRefRange extends BfoxRange {
 
 	public function __construct($start = 0, $end = 0) {
 		$this->set_start($start);
 		$this->set_end($end);
+	}
+
+	function startVerseVector() {
+		return BibleVerse::calc_ref($this->start);
+	}
+
+	function endVerseVector() {
+		return BibleVerse::calc_ref($this->end);
 	}
 
 	public function set_start($start) {
@@ -296,13 +305,19 @@ class BfoxRef extends BfoxRangeList {
 	 * @return string
 	 */
 	public function get_string($name = '') {
-		return self::bcv_string(self::get_bcvs($this->sequences), $name);
+		$serializer = BfoxRefSerializer::sharedInstance();
+		$serializer->bookNameFormat = $name;
+		$serializer->pushRef($this);
+		return $serializer->popResult();
 	}
 
-	public static function bcv_string($bcvs, $name = '') {
-		$books = array();
-		foreach ($bcvs as $book => $cvs) $books []= self::create_book_string($book, $cvs, $name);
-		return implode('; ', $books);
+	function refRanges() {
+		$ranges = $this->get_seqs();
+		$refRanges = array();
+		foreach ($ranges as $range) {
+			$refRanges []= new BfoxRefRange($range->start, $range->end);
+		}
+		return $refRanges;
 	}
 
 	/*
@@ -310,84 +325,6 @@ class BfoxRef extends BfoxRangeList {
 	 *
 	 *
 	 */
-
-	/**
-	 * Creates a string for a book with CVS values (see get_bcvs())
-	 *
-	 * @param integer $book
-	 * @param array $cvs
-	 * @param string $name
-	 * @return string
-	 */
-	public static function create_book_string($book, $cvs, $name = '') {
-		$str = '';
-		$prev_ch = 0;
-
-		foreach ((array) $cvs as $cv) {
-			list($ch1, $vs1) = $cv->start;
-			list($ch2, $vs2) = $cv->end;
-
-			$is_whole_book = FALSE;
-
-			// If chapter1 is 0, then this is either a whole book, or needs to begin at chapter 1
-			if (0 == $ch1) {
-				if (BibleVerse::max_chapter_id == $ch2) $is_whole_book = TRUE;
-				else $ch1 = BibleMeta::start_chapter;
-			}
-
-			if (!$is_whole_book) {
-				$is_whole_chapters = FALSE;
-
-				// If verse1 is 0, then this is either a whole chapter(s), or needs to begin at verse 1
-				if (0 == $vs1) {
-					if (BibleVerse::max_verse_id == $vs2) $is_whole_chapters = TRUE;
-					else $vs1 = BibleMeta::start_verse;
-				}
-
-				// Adjust the end chapter and verse to be the actual maximum chapter/verse we can display
-				$ch2 = min($ch2, BibleMeta::passage_end($book));
-				$vs2 = min($vs2, BibleMeta::passage_end($book, $ch2));
-
-				if ($ch1 != $prev_ch) {
-					if (!empty($str)) $str .= '; ';
-					// Whole Chapters
-					if ($is_whole_chapters) {
-						$str .= $ch1;
-						if ($ch1 != $ch2) $str .= "-$ch2";
-					}
-					// Inner Chapters
-					elseif ($ch1 == $ch2) {
-						$str .= "$ch1:$vs1";
-						if ($vs1 != $vs2) $str .= "-$vs2";
-					}
-					// Mixed Chapters
-					else {
-						$str .= $ch1;
-						if (BibleMeta::start_verse != $vs1) $str .= ":$vs1";
-						$str .= "-$ch2:$vs2";
-					}
-				}
-				else {
-					$str .= ",$vs1";
-					// Inner Chapters
-					if ($ch1 == $ch2) {
-						if ($vs1 != $vs2) $str .= "-$vs2";
-					}
-					// Mixed Chapters
-					else {
-						$str .= "-$ch2:$vs2";
-					}
-				}
-
-				$prev_ch = $ch2;
-			}
-		}
-
-		if (BibleMeta::name_none == $name) return $str;
-		if (!empty($str)) $str = " $str";
-
-		return BibleMeta::get_book_name($book, $name) . $str;
-	}
 
 	/**
 	 * Converts a sequence in bcv form to an array of sequences, with each element being a separate chapter

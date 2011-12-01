@@ -80,17 +80,26 @@ class BfoxTests {
 		$this->test_ref('1sam 1-2', '1 Samuel 1-2');
 		$this->test_ref('1sam 1:1', '1 Samuel 1:1');
 		$this->test_ref('1sam 1:1-5', '1 Samuel 1:1-5');
-		$this->test_ref('1sam 1:1-2:5', '1 Samuel 1-2:5');
+		$this->test_ref('1sam 1:1-2:5', '1 Samuel 1:1-2:5');
 		$this->test_ref('1sam 1:2-2:5', '1 Samuel 1:2-2:5');
-		$this->test_ref('1sam 1-2:5', '1 Samuel 1-2:5');
+		$this->test_ref('1sam 1-2:5', '1 Samuel 1:1-2:5');
+
+		// Test Serializer options
+		$serializer = BfoxRefSerializer::sharedInstance();
+		$serializer->setCombineNone();
+		$this->test_ref('Gen 1:1,3', 'Genesis 1:1; Genesis 1:3');
+		$serializer->setCombineBooks();
+		$this->test_ref('Gen 1:1,3', 'Genesis 1:1; 1:3');
+		$serializer->setCombineChapters();
+		$this->test_ref('Gen 1:1,3', 'Genesis 1:1,3');
 
 		// Test periods
 		$this->test_ref('1sam. 1', '1 Samuel 1');
 		$this->test_ref('1sam 1.1', '1 Samuel 1:1');
 		$this->test_ref('1sam 1.1-5', '1 Samuel 1:1-5');
-		$this->test_ref('1sam 1.1-2.5', '1 Samuel 1-2:5');
+		$this->test_ref('1sam 1.1-2.5', '1 Samuel 1:1-2:5');
 		$this->test_ref('1sam 1.2-2.5', '1 Samuel 1:2-2:5');
-		$this->test_ref('1sam 1-2.5', '1 Samuel 1-2:5');
+		$this->test_ref('1sam 1-2.5', '1 Samuel 1:1-2:5');
 
 		// This test was failing (see bug 21)
 		$this->test_ref('Judges 2:6-3:6', 'Judges 2:6-3:6');
@@ -122,8 +131,8 @@ class BfoxTests {
 		$this->test_ref('rom 14:2-23', 'Romans 14:2-26');
 
 		// Test having consecutive books
-		$this->test_ref('Gen 2-100, Exodus', 'Genesis 2-50; Exodus');
-		$this->test_ref('Gen 2-100, Exodus, Lev', 'Genesis 2-50; Exodus; Leviticus');
+		$this->test_ref('Gen 2-100, Exodus', 'Genesis 2 - Exodus 40');
+		$this->test_ref('Gen 2-100, Exodus, Lev', 'Genesis 2 - Leviticus 27');
 
 		// Test long strings with lots of garbage
 		$this->test_ref('hello dude genesis 1,;,2 gen 5 1 sam 4, song ;of song 3', 'Genesis 1-2; 5; 1 Samuel 4; Song of Solomon'); // TODO3: words like song get detected as the entire book Song of Solomon
@@ -132,7 +141,7 @@ class BfoxTests {
 		<p>What do you think? john. 21 Do you prefer<d><d> ex 2 or 1sam 3 - 4 or 1 th 4? gen 3:4-8:2 gen 3ddd:2 fff- 1 1 3 </p>
 		<p>exodus lala yoyo 4:5</p>
 		</xml>
-		", 'Genesis 1; 3-8:2; Exodus; 1 Samuel 3-4; John 21; 1 Thessalonians 4'); // TODO3: 'ex' is not detected because it is only 2 letters
+		", 'Genesis 1; 3:1-8:2; Exodus; 1 Samuel 3-4; John 21; 1 Thessalonians 4'); // TODO3: 'ex' is not detected because it is only 2 letters
 
 		// Test non-existent chapter
 		$this->test_ref('2jhn 2', 'Invalid', 'non-existent chapter');
