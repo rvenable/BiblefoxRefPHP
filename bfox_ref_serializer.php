@@ -195,7 +195,11 @@ class BfoxRefSerializer {
 	 * Return the punctuation needed for a certain level
 	 */
 	function punctuationForLevel($punctuation, $level) {
-		return $this->punctuation[$this->levelKeys[$level]][$punctuation];
+		if (isset($this->levelKeys[$level])) {
+			$levelKey = $this->levelKeys[$level];
+			return $this->punctuation[$levelKey][$punctuation];
+		}
+		return '';
 	}
 }
 
