@@ -270,7 +270,7 @@ class BfoxRefTaggerApi extends BfoxExternalCustomJSONPBibleToolApi {
  *
  */
 class BfoxNETBibleApi extends BfoxExternalBibleToolApi {
-	function __construct() {
+	function __construct($apiKey = '') {
 		$this->availableBibles = array('NET');
 
 		parent::__construct('http://labs.bible.org/api/?passage=%ref%&formatting=full', $apiKey);
