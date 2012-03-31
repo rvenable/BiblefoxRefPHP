@@ -32,7 +32,9 @@ class BfoxBibleToolLink {
 		}
 
 		foreach ($this->varCallbacks as $var => $callback) {
-			$this->varValues[$var] = call_user_func_array($callback, (array)$this->varCallbackParams[$var]);
+			$params = array();
+			if (isset($this->varCallbackParams[$var])) $params = (array) $this->varCallbackParams[$var];
+			$this->varValues[$var] = call_user_func_array($callback, $params);
 		}
 	}
 
